@@ -1,0 +1,105 @@
+import tkinter as tk
+from tkinter import messagebox
+import socket
+import os
+import sys
+import hashlib
+import random
+import string
+import urllib.request
+import platform
+
+# دالة لطباعة النصوص في الشاشة
+def log(text, color="#00FF00"):
+    term.config(state=tk.NORMAL)
+    term.insert(tk.END, text + "\n", color)
+    term.see(tk.END)
+    term.config(state=tk.DISABLED)
+
+# ═══════════════════════════════════════
+# الأدوات (وظائف بايثون حقيقية)
+# ═══════════════════════════════════════
+def get_ip():
+    try:
+        ip = urllib.request.urlopen('https://api.ipify.org').read().decode('utf8')
+        log(f"[+] تم اكتشاف الـ IP الحقيقي: {ip}", "#00FFFF")
+    except:
+        log("[!] فشل الاتصال بالإنترنت.", "#FF0000")
+
+def get_sys_info():
+    log(f"[+] نظام التشغيل: {platform.system()} {platform.release()}", "#FFFF00")
+    log(f"[+] اسم الجهاز: {platform.node()}", "#FFFF00")
+    log(f"[+] المعالج: {platform.processor()}", "#FFFF00")
+
+def generate_hash():
+    text = "SWILL_HACKER"
+    hash_obj = hashlib.sha256(text.encode())
+    log(f"[+] تم توليد هاش لـ ({text}):", "#00FF00")
+    log(f"{hash_obj.hexdigest()}", "#00FFFF")
+
+def scan_port():
+    target = "127.0.0.1" # فحص جهازك فقط
+    log(f"[*] جاري فحص المنافذ المفتوحة على {target}...", "#FFFF00")
+    open_ports = []
+    for port in range(1, 1025):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(0.01)
+        if s.connect_ex((target, port)) == 0:
+            open_ports.append(port)
+        s.close()
+    if open_ports:
+        log(f"[+] منافذ مفتوحة: {open_ports}", "#FF0000")
+    else:
+        log("[-] لا توجد منافذ مفتوحة (جهازك آمن).", "#00FF00")
+
+def gen_password():
+    chars = string.ascii_letters + string.digits + "!@#$%^&*"
+    pwd = ''.join(random.choice(chars) for i in range(16))
+    log(f"[+] تم توليد باسورد قوي: {pwd}", "#00FFFF")
+
+def fake_nuke():
+    log("[!] تم تفعيل بروتوكول التدمير...", "#FF0000")
+    log("[!] تدمير النظام...", "#FF0000")
+    messagebox.showwarning("تحذير", "الجهاز تعرض للاختراق! (هذه مزحة فقط)")
+
+# ═══════════════════════════════════════
+# واجهة المستخدم (Tkinter)
+# ═══════════════════════════════════════
+root = tk.Tk()
+root.title("🜏 SWILL ARSENAL v1.0")
+root.geometry("600x500")
+root.configure(bg="#0a0a0a")
+
+# العنوان
+title = tk.Label(root, text="🜏 Shadow Arsenal", font=("Courier", 20, "bold"), bg="#0a0a0a", fg="#FF0000")
+title.pack(pady=10)
+
+# الأزرار (شبكة)
+btn_frame = tk.Frame(root, bg="#0a0a0a")
+btn_frame.pack()
+
+def create_btn(text, cmd, r, c, color="#00FF00"):
+    btn = tk.Button(btn_frame, text=text, command=cmd, bg="#111", fg=color, 
+                    font=("Courier", 10, "bold"), width=20, height=2, relief="ridge", borderwidth=2)
+    btn.grid(row=r, column=c, padx=5, pady=5)
+
+# ترتيب الأزرار
+create_btn("[1] كشف الـ IP", get_ip, 0, 0, "#00FFFF")
+create_btn("[2] معلومات النظام", get_sys_info, 0, 1)
+create_btn("[3] فحص المنافذ", scan_port, 1, 0, "#FFFF00")
+create_btn("[4] توليد هاش", generate_hash, 1, 1, "#00FFFF")
+create_btn("[5] مولد باسورد", gen_password, 2, 0)
+create_btn("[6] تفجير النظام", fake_nuke, 2, 1, "#FF0000")
+
+# شاشة الطباعة (Console)
+term = tk.Text(root, bg="#000000", fg="#00FF00", font=("Courier", 10), height=10)
+term.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+term.tag_config("#FF0000", foreground="#FF0000")
+term.tag_config("#00FFFF", foreground="#00FFFF")
+term.tag_config("#FFFF00", foreground="#FFFF00")
+term.config(state=tk.DISABLED)
+
+log("Shadow Arsenal Initialized...", "#00FF00")
+log("Waiting for commands...", "#00FF00")
+
+root.mainloop()
